@@ -32,25 +32,32 @@ interface Task {
 }
 
 // TODO 1 (Melanny): Pon aquí la IP de tu computadora y el puerto de la API
-const URL = "http://TU_IP:3000/tasks";
+const URL = "http://192.168.1.14:3000/tasks";
 
 export default function Index() {
   // useState crea 'tasks' y 'setTasks' para guardar las tareas de la BD
   const [tasks, setTasks] = useState<Task[]>([]);
   const [searchText, setSearchText] = useState("");
+  
+ useEffect(() => {
+  getTasks();
+}, []);
+//melani-get que obtiene todas las tareas
+const getTasks = async () => {
+  try {
+    //Hace la petición
+    const response = await fetch(URL);
 
-  useEffect(() => {
-    // Descomenta la línea de abajo cuando getTasks esté programada
-    // getTasks();
-  }, []);
+    //Convierte a JSON
+    const data = await response.json();
 
-  const getTasks = async () => {
-    /* TODO 2 (Melanny): OBTENER TAREAS (GET ALL)
-       1. Haz un: const response = await fetch(URL);
-       2. Convierte la respuesta a JSON: const data = await response.json();
-       3. Guarda los datos usando: setTasks(data) o setTasks(data.data) dependiendo de tu API. */
-  };
+    //Guardar en el estado
+    setTasks(data);
 
+  } catch (error) {
+    console.log("Error al obtener tareas:", error);
+  }
+};
   return (
     <View style={styles.container}>
       <Text style={styles.headerTitle}>Mis Tareas 📝</Text>
