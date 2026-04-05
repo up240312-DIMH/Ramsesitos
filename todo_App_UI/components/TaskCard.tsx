@@ -31,15 +31,31 @@ interface Task {
 interface Props {
   task: Task;
 }
-
+//melani-funcion
 export default function TaskCard({ task }: Props) {
+  //Funcion eliminar tarea
   const deleteTask = async () => {
-    /* TODO 2 (Melanny): ELIMINAR TAREA (DELETE)
-       1. Crea la variable const URL = "http://TU_IP:3000/tasks" (la ruta de la API).
-       2. Haz un await fetch a esa URL sumándole el ID: `${URL}/${task.id}`.
-       3. Adentro del fetch, agrega el método: { method: 'DELETE' }. */
-    console.log("Se intentó borrar la tarea con ID:", task.id);
-  };
+    //url de la api
+  const URL = "http://192.168.1.14:3000/tasks";
+
+  //Se intento borrar
+  console.log("Se intentó borrar la tarea con ID:", task.id);
+  try {
+    //Petición DELETE al servidor usando el ID de la tarea
+    const response = await fetch(`${URL}/${task.id}`, {
+      method: "DELETE",
+    });
+
+    if (response.ok) {
+      console.log("Tarea eliminada correctamente");
+    } else {
+      console.log("No se pudo eliminar la tarea");
+    }
+
+  } catch (error) {
+    console.log("Error al eliminar:", error);
+  }
+};
 
   const toggleCompleted = async () => {
     /* TODO 3 (Opcional): MARCAR COMO COMPLETADA
