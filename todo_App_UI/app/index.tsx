@@ -38,10 +38,32 @@ export default function Index() {
   // useState crea 'tasks' y 'setTasks' para guardar las tareas de la BD
   const [tasks, setTasks] = useState<Task[]>([]);
   const [searchText, setSearchText] = useState("");
-  
- useEffect(() => {
-  getTasks();
-}, []);
+
+// -------  Parte de Enrique  -------
+
+// 1. Este useEffect "escucha" cada vez que escribes algo en el buscador
+  useEffect(() => {
+    if (searchText === "") {
+      getTasks(); // Si está vacío, trae todas las tareas
+    } else {
+      buscarTareas(); // Si hay texto, busca coincidencias
+    }
+  }, [searchText]);
+
+  // 2. La función que hace el GET al servidor para buscar
+  const buscarTareas = async () => {
+    try {
+      // Usamos la URL base y le agregamos el parámetro de búsqueda
+      const response = await fetch(`${URL}?title_like=${searchText}`);
+      const data = await response.json();
+      setTasks(data); // Actualizamos la lista en pantalla
+    } catch (error) {
+      console.log("Error al buscar:", error);
+    }
+  };
+
+// ----------
+
 //melani-get que obtiene todas las tareas
 const getTasks = async () => {
   try {
