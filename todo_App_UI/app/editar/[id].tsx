@@ -1,4 +1,4 @@
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 
@@ -19,31 +19,49 @@ export default function EditarTareaScreen() {
   const { id } = useLocalSearchParams();
 
   // TODO 1 (Quique): Pon aquí tu IP local (ojo, la URL ya trae el ID pegado)
-  const URL = `http://TU_IP:3000/tasks/${id}`;
+  const URL = `http://192.168.1.14:3000/tasks/${id}`;
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
 
+
   useEffect(() => {
-    // Descomenta esto cuando programes la función
-    // getUnaTarea();
+    getUnaTarea();
   }, [id]);
 
   const getUnaTarea = async () => {
-    /* TODO 2 (Quique): CARGAR LA TAREA VIEJA (GET ONE)
-       1. Haz: const response = await fetch(URL); 
-       2. Convierte a json: const data = await response.json();
-       3. Mete los datos a los inputs usando setTitle(data.title) etc.
-    */
+    try {
+      const response = await fetch(URL);
+      const data = await response.json();
+      
+      setTitle(data.title);
+      setDescription(data.description);
+    } catch (error) {
+      console.log("Error al cargar la tarea:", error);
+    }
   };
 
   const handleActualizar = async () => {
-    /* TODO 3 (Quique): GUARDAR CAMBIOS (PUT)
-       1. Arma el objeto modificado: const tareaModificada = { title, description };
-       2. Haz el fetch con método 'PUT' y body: JSON.stringify(tareaModificada).
-       3. Si sale bien, regresa al menú: router.back();
-    */
-    console.log("Se intentó actualizar la tarea #", id);
+    const tareaModificada = { title, description };
+    
+    try {
+      const response = await fetch(URL, {
+        method: "PUT",
+        headers: { 
+          "Content-Type": "application/json" 
+        },
+        body: JSON.stringify(tareaModificada),
+      });
+
+      if (response.ok) {
+        console.log("Se actualizó la tarea #", id);
+        router.back();
+      } else {
+        alert("El servidor no pudo actualizar la tarea");
+      }
+    } catch (error) {
+      console.log("Error de red al actualizar:", error);
+    }
   };
 
   return (
