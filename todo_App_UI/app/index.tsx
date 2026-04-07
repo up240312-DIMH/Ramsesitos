@@ -10,83 +10,52 @@ import {
 } from "react-native";
 import TaskCard from "../components/TaskCard";
 
-/**
- * ============================================================================
- * DICCIONARIO RÁPIDO DE ESTE ARCHIVO:
- * ============================================================================
- * - useState: Es la memoria de la pantalla. Guarda información (como la lista
- * de tareas). Si esa info cambia, la pantalla se redibuja automáticamente.
- * - useEffect: Un bloque de código que se ejecuta automáticamente *una sola
- * vez* en cuanto la pantalla se abre. Perfecto para llamar a la BD al inicio.
- * - ScrollView: Una caja especial que permite hacer scroll hacia arriba o abajo.
- * - map(): Función de JS que agarra una lista de cosas (el arreglo de la BD)
- * y "dibuja" un componente <TaskCard /> por cada elemento que encuentre.
- * ============================================================================
- */
-
 interface Task {
   id: number;
   title: string;
   description: string;
   completed: boolean;
+  created_at: Date;
 }
 
-// TODO 1 (Melanny): Pon aquí la IP de tu computadora y el puerto de la API
-const URL = "http://192.168.1.14:3000/tasks";
+const URL = "http://172.16.100.58:3000/todos";
 
 export default function Index() {
-  // useState crea 'tasks' y 'setTasks' para guardar las tareas de la BD
   const [tasks, setTasks] = useState<Task[]>([]);
   const [searchText, setSearchText] = useState("");
 
-// -------  Parte de Enrique  -------
-
-// 1. Este useEffect "escucha" cada vez que escribes algo en el buscador
   useEffect(() => {
-    if (searchText === "") {
-      getTasks(); // Si está vacío, trae todas las tareas
-    } else {
-      buscarTareas(); // Si hay texto, busca coincidencias
-    }
-  }, [searchText]);
+    getTasks();
+  }, []);
 
-  // 2. La función que hace el GET al servidor para buscar
-  const buscarTareas = async () => {
+  const getTasks = async () => {
     try {
-      // Usamos la URL base y le agregamos el parámetro de búsqueda
-      const response = await fetch(`${URL}?title_like=${searchText}`);
+      const response = await fetch(URL);
       const data = await response.json();
-      setTasks(data); // Actualizamos la lista en pantalla
+
+      if (Array.isArray(data)) {
+        setTasks(data);
+      } else if (data && Array.isArray(data.data)) {
+        setTasks(data.data);
+      } else {
+        setTasks([]);
+      }
     } catch (error) {
-      console.log("Error al buscar:", error);
+      console.log("Error al obtener tareas:", error);
     }
   };
 
-// ----------
+  const tareasFiltradas = tasks.filter((task) =>
+    task.title.toLowerCase().includes(searchText.toLowerCase()),
+  );
 
-//melani-get que obtiene todas las tareas
-const getTasks = async () => {
-  try {
-    //Hace la petición
-    const response = await fetch(URL);
-
-    //Convierte a JSON
-    const data = await response.json();
-
-    //Guardar en el estado
-    setTasks(data);
-
-  } catch (error) {
-    console.log("Error al obtener tareas:", error);
-  }
-};
   return (
     <View style={styles.container}>
       <Text style={styles.headerTitle}>Mis Tareas 📝</Text>
 
       <TextInput
         style={styles.searchInput}
-        placeholder="🔍 Buscar tarea..."
+        placeholder="Buscar tarea..."
         placeholderTextColor="#888"
         value={searchText}
         onChangeText={setSearchText}
@@ -98,14 +67,25 @@ const getTasks = async () => {
         </Pressable>
       </Link>
 
-      <Text style={styles.counterTitle}>Tareas existentes: {tasks.length}</Text>
+      <Text style={styles.counterTitle}>
+        Tareas encontradas: {tareasFiltradas.length}
+      </Text>
 
       <ScrollView style={styles.list}>
-        {/* TODO 3 (Melanny/Ivanna): Cuando getTasks funcione, este .map() 
-            dibujará las tarjetas pasándole la tarea actual a TaskCard. */}
-        {tasks.map((task) => (
-          <TaskCard key={task.id} task={task} />
+        {tareasFiltradas.map((task) => (
+          <TaskCard
+            key={task.id}
+            task={task}
+            onDelete={getTasks}
+            getTasks={getTasks}
+          />
         ))}
+
+        {tareasFiltradas.length === 0 && searchText !== "" && (
+          <Text style={{ color: "#aaa", textAlign: "center", marginTop: 20 }}>
+            No se encontraron tareas con "{searchText}"
+          </Text>
+        )}
       </ScrollView>
     </View>
   );

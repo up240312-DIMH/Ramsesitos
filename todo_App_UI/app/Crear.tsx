@@ -2,46 +2,34 @@ import { router } from "expo-router";
 import React, { useState } from "react";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 
-// URL de la API del profesor (localhost para pruebas en web)
-const URL = "http://localhost:3000/todos";
-
+const URL = "http://172.16.100.58:3000/todos";
 export default function CrearTareaScreen() {
-  // Estados para capturar el texto y manejar el mensaje de éxito
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [exito, setExito] = useState(false);
-
-  // Función asíncrona para enviar los datos a la base de datos
   const handleCrear = async () => {
-    // Creamos el objeto con la estructura que pide la API
     const nuevaTarea = {
       title: title,
       description: description,
     };
 
     try {
-      // Iniciamos la petición POST al servidor
       const response = await fetch(URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(nuevaTarea),
       });
-
-      // Si el servidor responde que todo está bien (status 200-299)
       if (response.ok) {
-        setExito(true); // Activamos el mensaje visual de éxito
+        setExito(true);
         console.log("Tarea guardada con éxito:", title);
 
-        // Esperamos 1.5 seg para que el usuario vea el mensaje antes de volver
         setTimeout(() => {
-          router.back();
-        }, 1500);
+          router.replace("/");
+        }, 1100);
       } else {
-        // Si el servidor rechaza los datos, avisamos al usuario
         alert("El servidor rechazó la tarea");
       }
     } catch (error) {
-      // Si falla la conexión a internet o la API está apagada
       console.log(error);
       alert("No se pudo conectar con la base de datos");
     }
@@ -49,9 +37,7 @@ export default function CrearTareaScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.headerTitle}>✨Crear Nueva tarea</Text>
-
-      {/* Input vinculado al estado 'title' mediante value y onChangeText */}
+      <Text style={styles.headerTitle}>Crear Nueva tarea</Text>
       <TextInput
         style={styles.input}
         placeholder="¿Qué tarea quieres realizar?"
@@ -59,8 +45,6 @@ export default function CrearTareaScreen() {
         value={title}
         onChangeText={setTitle}
       />
-
-      {/* Input multilínea vinculado al estado 'description' */}
       <TextInput
         style={[styles.input, styles.textArea]}
         placeholder="Agrega una descripción..."
@@ -69,15 +53,12 @@ export default function CrearTareaScreen() {
         onChangeText={setDescription}
         multiline
       />
-
-      {/* Botón que dispara la función handleCrear al ser presionado */}
       <Pressable style={styles.saveButton} onPress={handleCrear}>
         <Text style={styles.saveButtonText}>Guardar Tarea</Text>
       </Pressable>
 
-      {/* Operador lógico &&: si 'exito' es true, renderiza el mensaje verde */}
       {exito && (
-        <Text style={styles.successMessage}>✅ ¡Tarea guardada con éxito!</Text>
+        <Text style={styles.successMessage}> ¡Tarea guardada con éxito!</Text>
       )}
     </View>
   );
@@ -88,7 +69,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     marginTop: 40,
-    backgroundColor: "#121212", // Fondo oscuro para estilo dark mode
+    backgroundColor: "#121212",
   },
   headerTitle: {
     fontSize: 24,
@@ -119,7 +100,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   successMessage: {
-    color: "#4CAF50", // Color verde para indicar éxito (UX)
+    color: "#4CAF50",
     textAlign: "center",
     marginTop: 15,
     fontSize: 16,
