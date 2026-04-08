@@ -2,7 +2,7 @@ import { router } from "expo-router";
 import React, { useState } from "react";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 
-const URL = "http://172.16.100.58:3000/todos";
+const URL = "http://localhost:3000/todos";
 export default function CrearTareaScreen() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");

@@ -6,7 +6,7 @@ export default function EditarTareaScreen() {
   const { id } = useLocalSearchParams();
   const { tittle } = useLocalSearchParams();
 
-  const URL = `http://172.16.100.58:3000/todos/${id}`;
+  const URL = `http://localhost:3000/todos/${id}`;
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");

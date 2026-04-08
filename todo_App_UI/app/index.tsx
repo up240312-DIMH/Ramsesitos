@@ -18,7 +18,7 @@ interface Task {
   created_at: Date;
 }
 
-const URL = "http://172.16.100.58:3000/todos";
+const URL = "http://localhost:3000/todos";
 
 export default function Index() {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -27,19 +27,21 @@ export default function Index() {
   useEffect(() => {
     getTasks();
   }, []);
-
   const getTasks = async () => {
     try {
       const response = await fetch(URL);
       const data = await response.json();
 
+      let listaTareas: Task[] = [];
+
       if (Array.isArray(data)) {
-        setTasks(data);
+        listaTareas = data;
       } else if (data && Array.isArray(data.data)) {
-        setTasks(data.data);
-      } else {
-        setTasks([]);
+        listaTareas = data.data;
       }
+      const tareasOrdenadas = listaTareas.sort((a, b) => b.id - a.id);
+
+      setTasks(tareasOrdenadas);
     } catch (error) {
       console.log("Error al obtener tareas:", error);
     }

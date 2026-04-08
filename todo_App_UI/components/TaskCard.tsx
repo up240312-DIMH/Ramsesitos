@@ -17,7 +17,7 @@ interface Props {
 export default function TaskCard({ task, onDelete, getTasks }: Props) {
   //Funcion eliminar tarea
   const deleteTask = async () => {
-    const URL = "http://172.16.100.58:3000/todos";
+    const URL = "http://localhost:3000/todos";
     console.log("Se intentó borrar la tarea con ID:", task.id);
     try {
       const response = await fetch(`${URL}/${task.id}`, {
