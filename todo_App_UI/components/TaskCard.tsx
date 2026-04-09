@@ -1,5 +1,5 @@
 import { router } from "expo-router"; // ⚡ AGREGAMOS ROUTER AQUÍ
-import React from "react";
+import React, { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 interface Task {
@@ -14,7 +14,8 @@ interface Props {
   onDelete: () => void;
   getTasks: () => void;
 }
-export default function TaskCard({ task, onDelete, getTasks }: Props) {
+export default function TaskCard({ task, onDelete }: Props) {
+  const [mensajeExito, setMensajeExito] = useState<string | null>(null);
   //Funcion eliminar tarea
   const deleteTask = async () => {
     const URL = "http://localhost:3000/todos";
@@ -25,18 +26,28 @@ export default function TaskCard({ task, onDelete, getTasks }: Props) {
       });
 
       if (response.ok) {
-        console.log("Tarea eliminada correctamente");
-        onDelete();
+        setMensajeExito("¡Tarea eliminada!");
+        setTimeout(() => {
+          onDelete();
+        }, 1200);
       } else {
+        setMensajeExito("¡La tarea No se pudo Eliminar!");
+        setTimeout(() => {
+          onDelete();
+        }, 1200);
         console.log("No se pudo eliminar la tarea");
       }
     } catch (error) {
+      setMensajeExito("¡Error!");
+      setTimeout(() => {
+        onDelete();
+      }, 1200);
       console.log("Error al eliminar:", error);
     }
   };
 
   const toggleCompleted = async () => {
-    const URL_ACTUALIZAR = `http://172.16.100.58:3000/todos/${task.id}`;
+    const URL_ACTUALIZAR = `http://localhost:3000/todos/${task.id}`;
     const tareaModificada = {
       title: task.title,
       description: task.description,
@@ -53,9 +64,19 @@ export default function TaskCard({ task, onDelete, getTasks }: Props) {
       });
 
       if (response.ok) {
-        console.log("Estado de la tarea actualizado");
-        onDelete();
+        //setMensajeExito("Tarea Marcada como completada");
+        // onDelete();
+        if (!task.completed) {
+          setMensajeExito("Tarea Marcada como completada"); // (O el texto que le hayas puesto)
+        } else {
+          setMensajeExito("Tarea Marcada como Pendiente");
+        }
+        setTimeout(() => {
+          setMensajeExito(null);
+          onDelete();
+        }, 1200);
       } else {
+        setMensajeExito("No se pudo Marcar como completada");
         console.log("El servidor no pudo actualizar el estado");
       }
     } catch (error) {
@@ -66,7 +87,12 @@ export default function TaskCard({ task, onDelete, getTasks }: Props) {
   const irAEditar = () => {
     router.push({
       pathname: "/editar/[id]",
-      params: { id: task.id, tittle: task.title },
+      params: {
+        id: task.id,
+        tittle: task.title,
+        description: task.description,
+        completed: task.completed ? "true" : "false",
+      },
     });
   };
 
@@ -102,6 +128,11 @@ export default function TaskCard({ task, onDelete, getTasks }: Props) {
           <Text style={styles.btnText}> Borrar</Text>
         </Pressable>
       </View>
+      {mensajeExito && (
+        <View style={styles.mensajeContainer}>
+          <Text style={styles.mensajeTexto}>{mensajeExito}</Text>
+        </View>
+      )}
     </View>
   );
 }
@@ -131,4 +162,18 @@ const styles = StyleSheet.create({
   btnEdit: { backgroundColor: "#0277bd" },
   btnDelete: { backgroundColor: "#c62828" },
   btnText: { color: "#fff", fontSize: 12, fontWeight: "bold" },
+  mensajeContainer: {
+    marginTop: 15,
+    padding: 10,
+    backgroundColor: "#333",
+    borderRadius: 6,
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#4CAF50", // Borde verde sutil
+  },
+  mensajeTexto: {
+    color: "#4CAF50", // Color verde estilo éxito
+    fontWeight: "bold",
+    fontSize: 14,
+  },
 });

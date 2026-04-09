@@ -10,6 +10,7 @@ export default function EditarTareaScreen() {
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+
   const [completed] = useState(false);
   const [exito, setExito] = useState(false);
 
@@ -27,7 +28,6 @@ export default function EditarTareaScreen() {
 
       if (response.ok) {
         console.log("Se actualizó la tarea #", tittle);
-
         setExito(true);
         setTimeout(() => {
           router.replace("/");
@@ -64,9 +64,11 @@ export default function EditarTareaScreen() {
       <Pressable style={styles.updateButton} onPress={handleActualizar}>
         <Text style={styles.updateButtonText}>Guardar Cambios</Text>
       </Pressable>
+
+      {/* Agregamo mensaje que vera el usuario*/}
       {exito && (
         <Text style={styles.successMessage}>
-          ✅ ¡Tarea Actualizada {tittle} con Éxito!
+          ¡Tarea Actualizada {tittle} con Éxito!
         </Text>
       )}
     </View>
@@ -105,7 +107,7 @@ const styles = StyleSheet.create({
   },
   updateButtonText: { color: "white", fontWeight: "bold", fontSize: 16 },
   successMessage: {
-    color: "#4CAF50",
+    color: "#4CAF50", // Color verde para indicar éxito (UX)
     textAlign: "center",
     marginTop: 15,
     fontSize: 16,
